@@ -2,29 +2,24 @@
 #pragma once
 #include <stdint.h>
 #include "command_base.h"
+#include "progress_codes.h"
 #include "../unit.h"  // per unit::U_mm e unit::U_mm_s
 
 namespace logic {
 
 class LoadFilament : public CommandBase {
 public:
-  constexpr LoadFilament()
-    : CommandBase()
-    , result(ResultCode::OK)
-    {}
+  inline constexpr LoadFilament()
+    : CommandBase(), slot(0), result(ResultCode::OK) {}
 
-  bool Reset(uint8_t param) override;
-  bool StepInner() override;
-
-  // Restituisce il risultato dell’ultimo comando
-  ResultCode Result() const override; 
+  bool   Reset(uint8_t param) override;
+  bool   StepInner() override;
+  ResultCode Result() const override { return result; }
 
 private:
-  void Reset2(bool feedPhaseLimited);
-  void LoadFinishedCorrectly();
-
-  uint8_t      verifyLoadedFilament{0};
-  ResultCode   result;
+  void   LoadFinishedCorrectly();
+  uint8_t    slot;
+  ResultCode result;
 };
 
 extern LoadFilament loadFilament;

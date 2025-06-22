@@ -6,23 +6,18 @@
 #include "../modules/motion.h"
 #include "../modules/pulley.h"
 
+
 namespace logic {
 
 UnloadFilament unloadFilament;
 
 bool UnloadFilament::Reset(uint8_t param) {
-    // memorizza lo slot che ci passa la printer
-    slot = param;
+    slot = param;  // salvo lo slot che mi arriva da Marlin
 
-    // 1) inizializza la puleggia
     mpu::pulley.InitAxis();
-
-    // 2) ingaggia l’idler sullo slot corretto
     state = ProgressCode::EngagingIdler;
     error = ErrorCode::RUNNING;
-    mi::idler.Engage(slot);
-
-    // 3) spegni eventuali LED di stato
+    mi::idler.Engage(slot);      // uso 'slot', non globals.ActiveSlot()
     ml::leds.SetAllOff();
     return true;
 }
@@ -34,10 +29,9 @@ bool UnloadFilament::StepInner() {
     switch (state) {
         case P::EngagingIdler:
             if (mi::idler.Engaged()) {
-                // appena ingaggiato → pianifica retrazione
                 mpu::pulley.InitAxis();
-                constexpr auto UNLOAD_MM       = unit::U_mm{-100};  // ad esempio -100 mm
-                constexpr auto UNLOAD_FEEDRATE = unit::U_mm_s{50};  // a 50 mm/s
+                constexpr auto UNLOAD_MM       = unit::U_mm{-100};
+                constexpr auto UNLOAD_FEEDRATE = unit::U_mm_s{50};
                 mpu::pulley.PlanMove(UNLOAD_MM, UNLOAD_FEEDRATE);
                 state = P::UnloadingToPulley;
             }
@@ -45,7 +39,6 @@ bool UnloadFilament::StepInner() {
 
         case P::UnloadingToPulley:
             if (mm::motion.QueueEmpty(mm::Axis::Pulley)) {
-                // poi sgancia l’idler
                 mi::idler.Disengage();
                 state = P::DisengagingIdler;
             }
@@ -65,7 +58,6 @@ bool UnloadFilament::StepInner() {
             error = EC::INTERNAL;
             return true;
     }
-
     return false;
 }
 
@@ -74,7 +66,7 @@ void UnloadFilament::UnloadFinishedCorrectly() {
     mpu::pulley.Disable();
     ml::leds.SetAllOff();
 
-    // registra lo stato “AtPulley” per lo slot corretto
+    // qui forzo ActiveSlot sul valore corretto
     mg::globals.SetFilamentLoaded(slot, mg::FilamentLoadState::AtPulley);
 }
 
