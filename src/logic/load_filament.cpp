@@ -1,12 +1,13 @@
 /// @file load_filament.cpp
 #include "load_filament.h"
+#include "progress_codes.h"
 #include "../modules/globals.h"
 #include "../modules/idler.h"
 #include "../modules/leds.h"
 #include "../modules/motion.h"
 #include "../modules/pulley.h"
 #include "../unit.h"        // per unit::U_mm e unit::U_mm_s
-#include "../modules/progress_codes.h"
+
 #include "../modules/globals.h"
 #include "../debug.h"
 
