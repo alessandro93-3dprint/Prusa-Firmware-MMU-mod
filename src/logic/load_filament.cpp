@@ -1,34 +1,23 @@
 /// @file load_filament.cpp
 #include "load_filament.h"
-#include "progress_codes.h"
 #include "../modules/globals.h"
 #include "../modules/idler.h"
 #include "../modules/leds.h"
 #include "../modules/motion.h"
 #include "../modules/pulley.h"
-#include "../unit.h"
+#include "../debug.h"
 
 namespace logic {
 
 LoadFilament loadFilament;
 
 bool LoadFilament::Reset(uint8_t param) {
-    // 1) Salva lo slot
-    slot = param;
-
-    // 2) Imposta stato globale (slot attivo + AtPulley)
-    mg::globals.SetFilamentLoaded(slot, mg::FilamentLoadState::AtPulley);
-
-    // 3) Prepara comando
-    error = ErrorCode::RUNNING;
+    slot = param;                     // memorizzo lo slot che mi passa la stampante
+    // NON chiamare qui mg::globals.SetActiveSlot(): quel compito spetta a ToolChange!
+    error = ErrorCode::RUNNING;       // partiamo in stato “running”
     state = ProgressCode::EngagingIdler;
-
-    // 4) Ingaggia idler
-    mi::idler.Engage(slot);
-
-    // 5) Spegni LED
     ml::leds.SetAllOff();
-
+    mi::idler.Engage(slot);           // ingaggio l’idler sullo slot giusto
     return true;
 }
 
@@ -37,35 +26,34 @@ bool LoadFilament::StepInner() {
     using EC = ErrorCode;
 
     switch (state) {
-    case P::EngagingIdler:
+      case P::EngagingIdler:
         if (mi::idler.Engaged()) {
-            // avvia preload
-            mpu::pulley.InitAxis();
-            constexpr auto PRELOAD_MM       = unit::U_mm{100};   // regolati qui
-            constexpr auto PRELOAD_FEEDRATE = unit::U_mm_s{50};  // regolati qui
-            mpu::pulley.PlanMove(PRELOAD_MM, PRELOAD_FEEDRATE);
-            state = P::FeedingToNozzle;
+          // appena ingaggiato → avvia prericarica
+          mpu::pulley.InitAxis();
+          constexpr auto PRELOAD_MM       = unit::U_mm{100};   // regola a piacere
+          constexpr auto PRELOAD_FEEDRATE = unit::U_mm_s{50};
+          mpu::pulley.PlanMove(PRELOAD_MM, PRELOAD_FEEDRATE);
+          state = P::FeedingToNozzle;
         }
         break;
 
-    case P::FeedingToNozzle:
+      case P::FeedingToNozzle:
         if (mm::motion.QueueEmpty(mm::Axis::Pulley)) {
-            // finito preload → sgancia
-            mi::idler.Disengage();
-            state = P::DisengagingIdler;
+          mi::idler.Disengage();
+          state = P::DisengagingIdler;
         }
         break;
 
-    case P::DisengagingIdler:
+      case P::DisengagingIdler:
         if (mi::idler.Disengaged()) {
-            LoadFinishedCorrectly();
+          LoadFinishedCorrectly();
         }
         break;
 
-    case P::OK:
+      case P::OK:
         return true;
 
-    default:
+      default:
         state = P::ERRInternal;
         error = EC::INTERNAL;
         return true;
@@ -74,10 +62,19 @@ bool LoadFilament::StepInner() {
     return false;
 }
 
+ResultCode LoadFilament::Result() const {
+    // se non c’è stato errore restituisco OK, altrimenti “Cancelled”
+    return (error == ErrorCode::OK)
+           ? ResultCode::OK
+           : ResultCode::Cancelled;
+}
+
 void LoadFilament::LoadFinishedCorrectly() {
-    FinishedOK();
+    FinishedOK();                      // porta state a OK
     mpu::pulley.Disable();
     ml::leds.SetAllOff();
+    // informo il modulo globals che questo slot ora è “InNozzle”
+    mg::globals.SetFilamentLoaded(slot, mg::FilamentLoadState::InNozzle);
 }
 
 } // namespace logic
