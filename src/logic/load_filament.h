@@ -9,17 +9,17 @@ namespace logic {
 
 class LoadFilament : public CommandBase {
 public:
-  inline constexpr LoadFilament()
-    : CommandBase(), slot(0), result(ResultCode::OK) {}
+  constexpr LoadFilament() : CommandBase(), slot(0), error(ResultCode::OK) {}
 
-  bool   Reset(uint8_t param) override;
-  bool   StepInner() override;
-  ResultCode Result() const override { return result; }
+  bool Reset(uint8_t param) override;
+  bool StepInner() override;
+  ResultCode Result() const override { return (error == ErrorCode::OK) ? ResultCode::OK : ResultCode::ERROR_INTERNAL; }
 
 private:
-  void   LoadFinishedCorrectly();
-  uint8_t    slot;
-  ResultCode result;
+  void LoadFinishedCorrectly();
+
+  uint8_t slot;
+  ErrorCode error;
 };
 
 extern LoadFilament loadFilament;
