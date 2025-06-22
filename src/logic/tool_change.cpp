@@ -69,6 +69,7 @@ bool ToolChange::StepInner() {
             // There is no way the UnloadFilament to finish in an error state
             // But planning the next move can fail if Selector refuses moving to the next slot
             // - that scenario is handled inside GoToFeedingToFinda
+            mg::globals.SetFilamentLoaded(plannedSlot, mg::FilamentLoadState::AtPulley);
             GoToFeedingToBondtech();
         }
         break;
