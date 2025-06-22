@@ -78,8 +78,6 @@ bool LoadFilament::StepInner() {
 }
 
 ResultCode LoadFilament::Result() const {
-    // reportto printer: OK o ERROR
-    return (error == ErrorCode::OK) ? ResultCode::OK : ResultCode::ERROR;
-}
+  return result;
 
 } // namespace logic
