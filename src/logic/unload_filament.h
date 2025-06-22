@@ -15,7 +15,10 @@ namespace logic {
 class UnloadFilament : public CommandBase {
 public:
   constexpr UnloadFilament()
-    : CommandBase(), slot(0), result(ResultCode::OK) {}
+    : CommandBase()
+    , slot(0)
+    , result(ResultCode::OK) 
+    {}
 
   /// @param param = indice dello slot da scaricare
   bool Reset(uint8_t param) override;

@@ -1,5 +1,6 @@
 #include "unload_filament.h"
 #include "../unit.h"
+#include "progress_codes.h"
 #include "../modules/globals.h"
 #include "../modules/idler.h"
 #include "../modules/leds.h"
@@ -11,15 +12,21 @@ namespace logic {
 UnloadFilament unloadFilament;
 
 bool UnloadFilament::Reset(uint8_t param) {
-    slot  = param;               // memorizza lo slot
-    mpu::pulley.InitAxis();      // inizializza puleggia
+  slot = param;
+  // aggiorna anche globals.ActiveSlot internamente
+  mg::globals.SetFilamentLoaded(slot, mg::FilamentLoadState::AtPulley);
 
-    state = ProgressCode::EngagingIdler;
-    error = ErrorCode::RUNNING;
-    mi::idler.Engage(slot);
+  // 1) prepara la puleggia
+  mpu::pulley.InitAxis();
 
-    ml::leds.SetAllOff();
-    return true;
+  // 2) ingaggia l’idler sullo slot giusto
+  state = ProgressCode::EngagingIdler;
+  error = ErrorCode::RUNNING;
+  mi::idler.Engage(slot);
+
+  // 3) pulizia LED
+  ml::leds.SetAllOff();
+  return true;
 }
 
 bool UnloadFilament::StepInner() {

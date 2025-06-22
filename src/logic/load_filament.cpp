@@ -81,9 +81,6 @@ void LoadFilament::LoadFinishedCorrectly() {
     mpu::pulley.Disable();
     ml::leds.SetAllOff();
 
-    // già fatto in Reset, ma puoi ripetere se vuoi:
-    mg::globals.SetFilamentLoaded(slot, mg::FilamentLoadState::AtPulley);
-    result = ResultCode::OK;
 }
 
 } // namespace logic
