@@ -13,8 +13,8 @@ UnloadFilament unloadFilament;
 
 bool UnloadFilament::Reset(uint8_t param) {
   slot = param;
-  // aggiorna anche globals.ActiveSlot internamente
-  mg::globals.SetFilamentLoaded(slot, mg::FilamentLoadState::AtPulley);
+  
+  mg::globals.SetActiveSlot(slot);          // ← aggiorniamo anche l’ActiveSlot globale
 
   // 1) prepara la puleggia
   mpu::pulley.InitAxis();
@@ -56,7 +56,7 @@ bool UnloadFilament::StepInner() {
             FinishedOK();
             mpu::pulley.Disable();
             ml::leds.SetAllOff();
-            mg::globals.SetFilamentLoaded(slot, mg::FilamentLoadState::AtPulley);
+            mg::globals.SetFilamentLoaded(slot, mg::FilamentLoadState::AtPulley); 
         }
         break;
 

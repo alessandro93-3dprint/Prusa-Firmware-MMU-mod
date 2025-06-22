@@ -19,6 +19,8 @@ bool LoadFilament::Reset(uint8_t param) {
     // 1) Salva lo slot che ci manda la stampante
     slot = param;
 
+    mg::globals.SetActiveSlot(slot);          // ← aggiorniamo anche l’ActiveSlot globale
+
     // 2) Aggiorna lo stato globale (in selector/pulley)
     mg::globals.SetFilamentLoaded(slot, mg::FilamentLoadState::AtPulley);
 
