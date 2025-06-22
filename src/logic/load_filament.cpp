@@ -79,5 +79,6 @@ bool LoadFilament::StepInner() {
 
 ResultCode LoadFilament::Result() const {
   return result;
+}
 
 } // namespace logic
