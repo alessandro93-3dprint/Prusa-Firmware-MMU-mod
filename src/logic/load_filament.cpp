@@ -1,32 +1,29 @@
 /// @file load_filament.cpp
 #include "load_filament.h"
-#include "../unit.h"    // per unit::U_mm e unit::U_mm_s
 #include "../modules/globals.h"
 #include "../modules/idler.h"
 #include "../modules/leds.h"
 #include "../modules/motion.h"
 #include "../modules/pulley.h"
+#include "../unit.h"        // per unit::U_mm e unit::U_mm_s
+#include "../modules/progress_codes.h"
+#include "../modules/globals.h"
+#include "../debug.h"
 
 namespace logic {
 
 LoadFilament loadFilament;
 
 bool LoadFilament::Reset(uint8_t param) {
-    if (!CheckToolIndex(param)) {
-        return false;
-    }
+    if (!CheckToolIndex(param)) return false;
 
-    // 1) aggiorno globals con il nuovo slot e imposto stato "AtPulley"
+    // imposta slot attivo e stato di caricamento
     mg::globals.SetFilamentLoaded(param, mg::FilamentLoadState::AtPulley);
-
-    // 2) resetto eventuali errori e metto RUNNING
     error = ErrorCode::RUNNING;
 
-    // 3) primo step: ingaggio l’idler sullo slot "param"
+    // primo step: ingaggia idler
     state = ProgressCode::EngagingIdler;
     mi::idler.Engage(param);
-
-    // 4) spengo i LED
     ml::leds.SetAllOff();
     return true;
 }
@@ -38,18 +35,19 @@ bool LoadFilament::StepInner() {
     switch (state) {
         case P::EngagingIdler:
             if (mi::idler.Engaged()) {
-                // appena ingaggiato → pianifica caricamento a lunghezza fissa
+                // appena ingaggiato → pianifica precarica (preload)
                 mpu::pulley.InitAxis();
                 constexpr auto PRELOAD_MM       = unit::U_mm{60};
                 constexpr auto PRELOAD_FEEDRATE = unit::U_mm_s{100};
                 mpu::pulley.PlanMove(PRELOAD_MM, PRELOAD_FEEDRATE);
-                state = P::UnloadingToPulley;  // o il tuo ProgressCode giusto per "FeedToNozzle"
+                state = P::FeedingToNozzle;
             }
             break;
 
-        case P::UnloadingToPulley:
+        case P::FeedingToNozzle:
+            // attendi che termini la movimentazione
             if (mm::motion.QueueEmpty(mm::Axis::Pulley)) {
-                // fine precarica → sgancio idler
+                // sgancia idler e chiudi
                 mi::idler.Disengage();
                 state = P::DisengagingIdler;
             }
@@ -57,11 +55,10 @@ bool LoadFilament::StepInner() {
 
         case P::DisengagingIdler:
             if (mi::idler.Disengaged()) {
-                // completato con successo
+                // completato OK
                 FinishedOK();
                 mpu::pulley.Disable();
                 ml::leds.SetAllOff();
-                // lo stato globals è già stato aggiornato in Reset
             }
             break;
 
@@ -78,7 +75,7 @@ bool LoadFilament::StepInner() {
 }
 
 ResultCode LoadFilament::Result() const {
-  return result;
+    return result;
 }
 
 } // namespace logic
