@@ -45,8 +45,8 @@ bool LoadFilament::StepInner() {
             if (mi::idler.Engaged()) {
                 // appena ingaggiato → avvia caricamento by length
                 mpu::pulley.InitAxis();
-                constexpr auto PRELOAD_MM       = unit::U_mm{ preLoadMmValue };      // metti il valore voluto
-                constexpr auto PRELOAD_FEEDRATE = unit::U_mm_s{ preLoadFeedrate };  // es. 100 mm/s
+                constexpr auto PRELOAD_MM       = unit::U_mm{100};      // metti il valore voluto
+                constexpr auto PRELOAD_FEEDRATE = unit::U_mm_s{50};  // es. 100 mm/s
                 mpu::pulley.PlanMove(PRELOAD_MM, PRELOAD_FEEDRATE);
                 state = P::FeedingToNozzle;
             }
