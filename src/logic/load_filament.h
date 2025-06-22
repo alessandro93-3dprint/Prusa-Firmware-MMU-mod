@@ -17,9 +17,7 @@ public:
   bool StepInner() override;
 
   // Restituisce il risultato dell’ultimo comando
-  ResultCode Result() const override { 
-    return result; 
-  }
+  ResultCode Result() const override 
 
 private:
   void Reset2(bool feedPhaseLimited);
