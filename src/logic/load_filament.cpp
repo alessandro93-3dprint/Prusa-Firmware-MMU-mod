@@ -16,34 +16,38 @@ namespace logic {
 LoadFilament loadFilament;
 
 bool LoadFilament::Reset(uint8_t param) {
-    slot   = param;  // salvo lo slot
-    result = ResultCode::OK;
+    // 1) Salva lo slot che ci manda la stampante
+    slot = param;
 
-    // non c’era controllo? lo rimetti se serve:
-    if (!CheckToolIndex(slot)) return false;
-
-    // setto subito ActiveSlot
+    // 2) Aggiorna lo stato globale (in selector/pulley)
     mg::globals.SetFilamentLoaded(slot, mg::FilamentLoadState::AtPulley);
 
+    // 3) Inizia il comando
     error = ErrorCode::RUNNING;
     state = ProgressCode::EngagingIdler;
-    mi::idler.Engage(slot);  // uso 'slot' esplicitamente
+
+    // 4) Ingaggia l’idler sullo slot giusto
+    mi::idler.Engage(slot);
+
+    // 5) Spegni eventuali LED
     ml::leds.SetAllOff();
+
     return true;
 }
+
 
 bool LoadFilament::StepInner() {
     using P  = ProgressCode;
     using EC = ErrorCode;
 
-    switch (state) {
+        switch (state) {
         case P::EngagingIdler:
             if (mi::idler.Engaged()) {
-                // avvio estrusione a lunghezza fissa o infinita, come vuoi
+                // appena ingaggiato → avvia caricamento by length
                 mpu::pulley.InitAxis();
-                constexpr auto LOAD_MM       = unit::U_mm{ 200 };   // es.
-                constexpr auto LOAD_FEEDRATE = unit::U_mm_s{ 50 };
-                mpu::pulley.PlanMove(LOAD_MM, LOAD_FEEDRATE);
+                constexpr auto PRELOAD_MM       = unit::U_mm{ preLoadMmValue };      // metti il valore voluto
+                constexpr auto PRELOAD_FEEDRATE = unit::U_mm_s{ preLoadFeedrate };  // es. 100 mm/s
+                mpu::pulley.PlanMove(PRELOAD_MM, PRELOAD_FEEDRATE);
                 state = P::FeedingToNozzle;
             }
             break;
