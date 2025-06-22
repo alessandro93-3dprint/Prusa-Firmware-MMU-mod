@@ -14,8 +14,6 @@ UnloadFilament unloadFilament;
 bool UnloadFilament::Reset(uint8_t param) {
   slot = param;
   
-  mg::globals.SetActiveSlot(slot);          // ← aggiorniamo anche l’ActiveSlot globale
-
   // 1) prepara la puleggia
   mpu::pulley.InitAxis();
 
@@ -53,10 +51,7 @@ bool UnloadFilament::StepInner() {
 
     case P::DisengagingIdler:
         if (mi::idler.Disengaged()) {
-            FinishedOK();
-            mpu::pulley.Disable();
-            ml::leds.SetAllOff();
-            mg::globals.SetFilamentLoaded(slot, mg::FilamentLoadState::AtPulley); 
+            UnloadFinishedCorrectly();
         }
         break;
 
@@ -71,5 +66,12 @@ bool UnloadFilament::StepInner() {
     return false;
 }
 
+void UnloadFilament::UnloadFinishedCorrectly() {
+    FinishedOK();
+    mpu::pulley.Disable();
+    ml::leds.SetAllOff();
+    // qui registri solo lo stato di caricamento, senza toccare ActiveSlot
+    mg::globals.SetFilamentLoaded(slot, mg::FilamentLoadState::AtPulley);
+}
 
 } // namespace logic
