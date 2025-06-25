@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 #include <stdint.h>
 #include "command_base.h"
 #include "progress_codes.h"
