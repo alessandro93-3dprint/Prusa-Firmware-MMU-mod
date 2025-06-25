@@ -7,7 +7,6 @@
 #include "../modules/fsensor.h"
 #include "../modules/idler.h"
 #include "../modules/pulley.h"
-#include "../modules/selector.h"
 #include "../modules/motion.h"
 #include "../modules/leds.h"
 #include "../modules/user_input.h"
@@ -155,7 +154,6 @@ void CommandBase::Panic(ErrorCode ec) {
 void CommandBase::InvalidateHoming() {
     ResumeIdlerSelector();
     mi::idler.InvalidateHoming();
-    ms::selector.InvalidateHoming();
 }
 
 void CommandBase::InvalidateHomingAndFilamentState() {

@@ -20,5 +20,4 @@ target_sources(
           user_input.cpp
           voltage.cpp
           finda.cpp
-          selector.cpp
   )

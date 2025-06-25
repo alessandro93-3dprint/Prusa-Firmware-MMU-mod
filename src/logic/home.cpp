@@ -5,7 +5,6 @@
 #include "../modules/idler.h"
 #include "../modules/motion.h"
 #include "../modules/permanent_storage.h"
-#include "../modules/selector.h"
 #include "../debug.h"
 
 
