@@ -18,6 +18,8 @@
 #include "../../../../src/modules/selector.h"
 #include "../../../../src/modules/user_input.h"
 
+#include "../../../../src/logic/compat.h"
+
 #include "../../../../src/logic/no_command.h"
 
 #include "../stubs/stub_motion.h"

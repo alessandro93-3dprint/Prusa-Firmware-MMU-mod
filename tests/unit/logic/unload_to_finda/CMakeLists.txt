@@ -4,20 +4,14 @@ add_executable(
   ${CMAKE_SOURCE_DIR}/src/application.cpp
   ${CMAKE_SOURCE_DIR}/src/registers.cpp
   ${CMAKE_SOURCE_DIR}/src/logic/command_base.cpp
-  ${CMAKE_SOURCE_DIR}/src/logic/cut_filament.cpp
   ${CMAKE_SOURCE_DIR}/src/logic/eject_filament.cpp
-  ${CMAKE_SOURCE_DIR}/src/logic/feed_to_finda.cpp
   ${CMAKE_SOURCE_DIR}/src/logic/feed_to_bondtech.cpp
   ${CMAKE_SOURCE_DIR}/src/logic/home.cpp
   ${CMAKE_SOURCE_DIR}/src/logic/load_filament.cpp
-  ${CMAKE_SOURCE_DIR}/src/logic/move_selector.cpp
   ${CMAKE_SOURCE_DIR}/src/logic/no_command.cpp
-  ${CMAKE_SOURCE_DIR}/src/logic/retract_from_finda.cpp
-  ${CMAKE_SOURCE_DIR}/src/logic/set_mode.cpp
   ${CMAKE_SOURCE_DIR}/src/logic/start_up.cpp
   ${CMAKE_SOURCE_DIR}/src/logic/tool_change.cpp
   ${CMAKE_SOURCE_DIR}/src/logic/unload_filament.cpp
-  ${CMAKE_SOURCE_DIR}/src/logic/unload_to_finda.cpp
   ${CMAKE_SOURCE_DIR}/src/modules/buttons.cpp
   ${CMAKE_SOURCE_DIR}/src/modules/debouncer.cpp
   ${CMAKE_SOURCE_DIR}/src/modules/finda.cpp
@@ -44,7 +38,6 @@ add_executable(
   ${LOGIC_STUBS_DIR}/homing.cpp
   ${LOGIC_STUBS_DIR}/main_loop_stub.cpp
   ${LOGIC_STUBS_DIR}/stub_motion.cpp
-  test_unload_to_finda.cpp
   )
 
 # define required search paths

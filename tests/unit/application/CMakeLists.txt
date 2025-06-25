@@ -31,20 +31,14 @@ add_executable(
   ${LOGIC_STUBS_DIR}/stub_motion.cpp
   ${CMAKE_SOURCE_DIR}/src/logic/no_command.cpp
   ${CMAKE_SOURCE_DIR}/src/logic/command_base.cpp
-  ${CMAKE_SOURCE_DIR}/src/logic/cut_filament.cpp
   ${CMAKE_SOURCE_DIR}/src/logic/load_filament.cpp
-  ${CMAKE_SOURCE_DIR}/src/logic/move_selector.cpp
   ${CMAKE_SOURCE_DIR}/src/logic/no_command.cpp
   ${CMAKE_SOURCE_DIR}/src/logic/eject_filament.cpp
   ${CMAKE_SOURCE_DIR}/src/logic/tool_change.cpp
   ${CMAKE_SOURCE_DIR}/src/logic/unload_filament.cpp
   ${CMAKE_SOURCE_DIR}/src/logic/home.cpp
-  ${CMAKE_SOURCE_DIR}/src/logic/set_mode.cpp
   ${CMAKE_SOURCE_DIR}/src/logic/start_up.cpp
-  ${CMAKE_SOURCE_DIR}/src/logic/feed_to_finda.cpp
   ${CMAKE_SOURCE_DIR}/src/logic/feed_to_bondtech.cpp
-  ${CMAKE_SOURCE_DIR}/src/logic/retract_from_finda.cpp
-  ${CMAKE_SOURCE_DIR}/src/logic/unload_to_finda.cpp
   test_registers.cpp
   test_application.cpp
   )

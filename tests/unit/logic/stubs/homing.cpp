@@ -5,6 +5,7 @@
 #include "../../../../src/modules/idler.h"
 #include "../../../../src/modules/motion.h"
 #include "../../../../src/modules/selector.h"
+#include "../../../../src/logic/compat.h"
 
 #include "../stubs/stub_motion.h"
 
