@@ -37,7 +37,8 @@ enum class ProgressCode : RawProgressCode {
     ReturningSelector, // P22
     ParkingSelector, // P23
     EjectingFilament, // P24
-    RetractingFilament, // P25
+    RetractingFromFinda, // P25
+    RetractingFilament, // P26
 
     Homing, // P26
     MovingSelector, // P2
